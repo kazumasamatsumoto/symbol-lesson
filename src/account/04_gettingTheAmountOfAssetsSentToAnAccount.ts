@@ -1,5 +1,5 @@
-// 今までアカウントが送信したモザイクの総数
-import { PUBLICKEY, ADDRESS } from './../accountConfig';
+// 指定したアカウントへどれだけ送金したかがわかる。誰に貢いだかを把握するためのリスト
+import { PUBLICKEY, ADDRESS } from '../accountConfig';
 import { filter, map, mergeMap, toArray } from "rxjs/operators";
 import {
   Address,
@@ -12,7 +12,7 @@ import {
 
 const signerPublicKey = PUBLICKEY;
 
-const recipientRowAddress = ADDRESS;
+const recipientRowAddress = "TB6Q5E-YACWBP-CXKGIL-I6XWCH-DRFLTB-KUK34I-YJQ";
 const recipientAddress = Address.createFromRawAddress(recipientRowAddress);
 
 const mosaicIdHex = '2CF403E85507F39E';
