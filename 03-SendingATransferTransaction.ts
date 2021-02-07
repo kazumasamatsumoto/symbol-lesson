@@ -1,4 +1,3 @@
-import { ADDRESS, PRIVATEKEY } from "./../accountConfig";
 import {
   Account,
   Address,
@@ -10,9 +9,11 @@ import {
 } from "symbol-sdk";
 
 const example = async (): Promise<void> => {
-  const nodeUrl = "http://api-01.us-east-1.testnet.symboldev.network:3000";
+
+  // network 環境設定
+  const nodeUrl = "http://52.25.53.38:3000";
   const repositoryFactory = new RepositoryFactoryHttp(nodeUrl);
-  // symbolの時間軸と現世の時間軸の調整をする
+  // symbolのネットワークの時間と現在時間を合わせる
   const epochAdjustment = await repositoryFactory
     .getEpochAdjustment()
     .toPromise();
@@ -20,33 +21,35 @@ const example = async (): Promise<void> => {
   const networkGenerationHash = await repositoryFactory
     .getGenerationHash()
     .toPromise();
-  // {}は分割代入と言ってオブジェクトの値から欲しい値だけを取り出すことができる
   const { currency } = await repositoryFactory.getCurrencies().toPromise();
 
-  const rawAddress = "TB6Q5E-YACWBP-CXKGIL-I6XWCH-DRFLTB-KUK34I-YJQ";
+  // 受け取り側の情報
+  const rawAddress = 'TC4FLK-B2FTKW-6TTOID-7JZSAM-UMGIT2-SSLCH5-QUI';
   const recipientAddress = Address.createFromRawAddress(rawAddress);
 
+  // トランザクションの中身
   const transferTransaction = TransferTransaction.create(
     Deadline.create(epochAdjustment),
     recipientAddress,
     [currency.createRelative(10)],
-    PlainMessage.create("This is a test message"),
+    PlainMessage.create('This is a test message'),
     networkType,
-    UInt64.fromUint(2000000)
+    UInt64.fromUint(2000000),
   );
 
-  const privateKey = PRIVATEKEY;
+  const privateKey = 'A4AD1EC2605BA2797172E140C2771D24F317039DD8D3CBCA6F117059F0031270';
   const account = Account.createFromPrivateKey(privateKey, networkType);
   const signedTransaction = account.sign(
     transferTransaction,
-    networkGenerationHash
+    networkGenerationHash,
   );
+  console.log('Payload:', signedTransaction.payload);
+  console.log('Transaction Hash:', signedTransaction.hash);
 
   const transactionRepository = repositoryFactory.createTransactionRepository();
-  const response = await transactionRepository
-    .announce(signedTransaction)
-    .toPromise();
+  const response = await transactionRepository.announce(signedTransaction).toPromise();
   console.log(response);
 };
+
 
 example().then();
